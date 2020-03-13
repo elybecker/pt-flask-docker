@@ -1,5 +1,6 @@
 # ========== Fetch a Docker image ========== 
-FROM pytorch/pytorch:1.0-cuda10.0-cudnn7-devel
+FROM pytorch/pytorch:1.0-cuda10.0-cudnn7-devel 
+#FROM pytorch/pytorch:latest
 
 
 # ========== Fetch Args ========== 

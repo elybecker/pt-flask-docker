@@ -10,7 +10,7 @@ services:
         - USER_NAME=${USER_NAME}
     ports:
       - ${APPLICATION_PORT}:5000
-    container_name: ${USER_NAME}s-container
+    container_name: erik-container
     image: ${PROJ_NAME}-image
     user: ${USER_ID}:${USER_ID}
     stdin_open: true

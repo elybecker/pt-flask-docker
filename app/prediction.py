@@ -6,18 +6,18 @@ from torchvision import transforms
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-
+#Check if we have
+use_cuda = torch.cuda.is_available()
+device = torch.device('cuda' if use_cuda else 'cpu')
 """Returns model loaded from disc"""
 def load_model():
     model_dir = 'model'
-    classes = open(os.join([model_dir,'classes']),'r').read().splitlines()
+    class_path = os.path.join(model_dir, 'classes.txt')
+    classes = open(class_path,'r').read().splitlines()
     logger.info('Classes are {}'.format(classes))    
 
-    model_path = os.join([model_dir,'simplecifar_jit.pth'])
+    model_path = os.path.join(model_dir,'simplecifar_jit.pth')
     logger.info('Model path is {}'.format(model_path))  
-
-    use_cuda = torch.cuda.is_available()
-    device = torch.device('cuda' if use_cuda else 'cpu')
     
     model = torch.jit.load(model_path, map_location=device)
     logger.info('Deploying model to device: {}'.format(device)) 
@@ -35,11 +35,12 @@ def prediction(model, classes, image_tensor):
     logger.info('Predicted class is {} with a probability of {}'.format(prediction, probability)) 
     return {'class': prediction, 'probability': probability}
 
- """Transforms the posted image to a PyTorch Tensor."""
+"""Transforms the posted image to a PyTorch Tensor."""
 def image_to_tensor(img):
 
     img_tensor = preprocess_pipeline(img)
-    img_tensor = img_tensor.unsqueeze(0).cuda() # 3d to 4d for batch
+    img_tensor = img_tensor.unsqueeze(0).to(device) # 3d to 4d for batch
+    
     return img_tensor
 
 """The main inference function which gets passed an image to classify"""
@@ -47,7 +48,7 @@ def inference(img):
     
 
     image_tensor = image_to_tensor(img)
-    response = predict(model, classes, image_tensor)
+    response = prediction(model, classes, image_tensor)
     return {
         "statusCode": 200,
         "body": json.dumps(response)
